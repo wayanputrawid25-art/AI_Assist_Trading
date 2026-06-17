@@ -10,9 +10,10 @@ export default defineConfig({
             '@': resolve(__dirname, './resources/js')
         }
     },
+    base: './',
     build: {
         manifest: true,
-        outDir: 'public/build',
+        outDir: 'dist',
         emptyOutDir: true
     },
     server: {

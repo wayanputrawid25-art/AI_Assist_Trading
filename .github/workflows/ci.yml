@@ -27,7 +27,6 @@ jobs:
 
       - name: Run linting
         run: npm run lint
-        continue-on-error: true
 
   type-check:
     name: Type Check
@@ -45,11 +44,11 @@ jobs:
 
       - name: Run type check
         run: npm run type-check
-        continue-on-error: true
 
   test:
     name: Test
     runs-on: ubuntu-latest
+    needs: [lint, type-check]
     services:
       postgres:
         image: postgres:15
@@ -79,11 +78,9 @@ jobs:
         run: npm run test:ci
         env:
           DATABASE_URL: postgresql://test:test@localhost:5432/forexos_test
-        continue-on-error: true
 
       - name: Upload coverage
         uses: codecov/codecov-action@v4
-        if: always()
         with:
           files: ./coverage/lcov.info
           fail_ci_if_error: false
@@ -104,7 +101,6 @@ jobs:
 
       - name: Run Ruff
         run: ruff check robot/
-        continue-on-error: true
 
   python-type-check:
     name: Python Type Check
@@ -124,7 +120,6 @@ jobs:
 
       - name: Run mypy
         run: poetry run mypy robot/
-        continue-on-error: true
 
   python-test:
     name: Python Test

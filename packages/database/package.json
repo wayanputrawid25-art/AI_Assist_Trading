@@ -7,21 +7,23 @@
   "exports": {
     ".": "./src/index.ts",
     "./schema": "./src/schema/index.ts",
-    "./migrations": "./drizzle/migrations"
+    "./repositories": "./src/repositories/index.ts"
   },
   "scripts": {
     "generate": "drizzle-kit generate",
     "push": "drizzle-kit push",
     "migrate": "drizzle-kit migrate",
     "studio": "drizzle-kit studio",
-    "check": "drizzle-kit check"
+    "check": "drizzle-kit check",
+    "build": "tsc --build",
+    "clean": "rm -rf dist"
   },
   "dependencies": {
     "@neondatabase/serverless": "^0.9.0",
     "drizzle-orm": "^0.30.0"
   },
   "devDependencies": {
-    "@forexos/config": "*",
+    "@forexos/config": "workspace:*",
     "@types/node": "^20.12.0",
     "drizzle-kit": "^0.21.0",
     "typescript": "^5.4.0"

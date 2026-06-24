@@ -8,9 +8,11 @@
     ".": "./src/index.ts",
     "./api": "./src/api.ts",
     "./trading": "./src/trading.ts",
-    "./user": "./src/user.ts"
+    "./user": "./src/user.ts",
+    "./database": "./src/database.ts"
   },
   "devDependencies": {
+    "@forexos/config": "workspace:*",
     "typescript": "^5.4.0"
   }
 }

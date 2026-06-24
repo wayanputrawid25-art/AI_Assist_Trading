@@ -1,5 +1,5 @@
 // Trading Positions table
-import { pgTable, uuid, varchar, integer, decimal, timestamp, text, foreignKey } from 'drizzle-orm/pg-core';
+import { pgTable, uuid, varchar, integer, decimal, timestamp, text, foreignKey, index } from 'drizzle-orm/pg-core';
 import { accounts } from './accounts';
 
 export const positions = pgTable('positions', {
@@ -21,7 +21,11 @@ export const positions = pgTable('positions', {
   openedAt: timestamp('opened_at', { withTimezone: true }).notNull(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
   closedAt: timestamp('closed_at', { withTimezone: true }),
-});
+}, (table) => ({
+  accountIdIdx: index('positions_account_id_idx').on(table.accountId),
+  symbolIdx: index('positions_symbol_idx').on(table.symbol),
+  mt5TicketIdx: index('positions_mt5_ticket_idx').on(table.mt5Ticket),
+}));
 
 export type Position = typeof positions.$inferSelect;
 export type NewPosition = typeof positions.$inferInsert;

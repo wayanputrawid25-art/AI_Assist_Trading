@@ -52,6 +52,9 @@ export class TradesRepository {
 
   async create(data: NewTrade): Promise<Trade> {
     const [trade] = await db.insert(trades).values(data).returning();
+    if (!trade) {
+      throw new Error('Failed to create trade');
+    }
     return trade;
   }
 

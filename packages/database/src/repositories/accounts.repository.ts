@@ -43,6 +43,9 @@ export class AccountsRepository {
     }
 
     const [account] = await db.insert(accounts).values(data).returning();
+    if (!account) {
+      throw new Error('Failed to create account');
+    }
     return account;
   }
 
@@ -90,7 +93,7 @@ export class AccountsRepository {
       .update(accounts)
       .set({ updatedAt: new Date() })
       .where(eq(accounts.id, id));
-    return result.rowCount > 0;
+    return (result.rowCount ?? 0) > 0;
   }
 
   async count(): Promise<number> {

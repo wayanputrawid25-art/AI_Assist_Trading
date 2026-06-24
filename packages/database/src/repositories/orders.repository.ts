@@ -54,6 +54,9 @@ export class OrdersRepository {
 
   async create(data: NewOrder): Promise<Order> {
     const [order] = await db.insert(orders).values(data).returning();
+    if (!order) {
+      throw new Error('Failed to create order');
+    }
     return order;
   }
 
@@ -95,7 +98,7 @@ export class OrdersRepository {
 
   async delete(id: string): Promise<boolean> {
     const result = await db.delete(orders).where(eq(orders.id, id));
-    return result.rowCount > 0;
+    return (result.rowCount ?? 0) > 0;
   }
 
   async countByAccountId(accountId: string): Promise<number> {

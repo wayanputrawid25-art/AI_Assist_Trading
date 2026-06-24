@@ -19,14 +19,17 @@ export class UsersRepository {
   async findAll(limit = 50, offset = 0): Promise<User[]> {
     return db.query.users.findMany({
       where: isNull(users.deletedAt),
-      limit,
-      offset,
+      limit: limit ?? undefined,
+      offset: offset ?? undefined,
       orderBy: desc(users.createdAt),
     });
   }
 
   async create(data: NewUser): Promise<User> {
     const [user] = await db.insert(users).values(data).returning();
+    if (!user) {
+      throw new Error('Failed to create user');
+    }
     return user;
   }
 
@@ -44,12 +47,12 @@ export class UsersRepository {
       .update(users)
       .set({ deletedAt: new Date(), updatedAt: new Date() })
       .where(and(eq(users.id, id), isNull(users.deletedAt)));
-    return result.rowCount > 0;
+    return (result.rowCount ?? 0) > 0;
   }
 
   async hardDelete(id: string): Promise<boolean> {
     const result = await db.delete(users).where(eq(users.id, id));
-    return result.rowCount > 0;
+    return (result.rowCount ?? 0) > 0;
   }
 
   async count(): Promise<number> {

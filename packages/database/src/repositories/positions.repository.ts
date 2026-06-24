@@ -54,6 +54,9 @@ export class PositionsRepository {
 
   async create(data: NewPosition): Promise<Position> {
     const [position] = await db.insert(positions).values(data).returning();
+    if (!position) {
+      throw new Error('Failed to create position');
+    }
     return position;
   }
 
@@ -92,7 +95,7 @@ export class PositionsRepository {
 
   async delete(id: string): Promise<boolean> {
     const result = await db.delete(positions).where(eq(positions.id, id));
-    return result.rowCount > 0;
+    return (result.rowCount ?? 0) > 0;
   }
 
   async countOpenByAccountId(accountId: string): Promise<number> {

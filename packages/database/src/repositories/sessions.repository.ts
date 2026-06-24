@@ -34,6 +34,9 @@ export class SessionsRepository {
 
   async create(data: NewSession): Promise<Session> {
     const [session] = await db.insert(sessions).values(data).returning();
+    if (!session) {
+      throw new Error('Failed to create session');
+    }
     return session;
   }
 
@@ -51,7 +54,7 @@ export class SessionsRepository {
       .update(sessions)
       .set({ isActive: false })
       .where(eq(sessions.id, id));
-    return result.rowCount > 0;
+    return (result.rowCount ?? 0) > 0;
   }
 
   async invalidateAllForUser(userId: string): Promise<number> {
@@ -82,7 +85,7 @@ export class SessionsRepository {
 
   async delete(id: string): Promise<boolean> {
     const result = await db.delete(sessions).where(eq(sessions.id, id));
-    return result.rowCount > 0;
+    return (result.rowCount ?? 0) > 0;
   }
 }
 

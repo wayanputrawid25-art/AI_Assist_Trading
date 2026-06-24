@@ -29,6 +29,9 @@ export class StrategiesRepository {
 
   async create(data: NewStrategy): Promise<Strategy> {
     const [strategy] = await db.insert(strategies).values(data).returning();
+    if (!strategy) {
+      throw new Error('Failed to create strategy');
+    }
     return strategy;
   }
 
@@ -43,7 +46,7 @@ export class StrategiesRepository {
 
   async delete(id: string): Promise<boolean> {
     const result = await db.delete(strategies).where(eq(strategies.id, id));
-    return result.rowCount > 0;
+    return (result.rowCount ?? 0) > 0;
   }
 
   async toggleActive(id: string): Promise<Strategy | undefined> {

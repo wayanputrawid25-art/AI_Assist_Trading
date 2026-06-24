@@ -1,5 +1,5 @@
 // Trading Orders table
-import { pgTable, uuid, varchar, integer, decimal, timestamp, boolean, text, foreignKey } from 'drizzle-orm/pg-core';
+import { pgTable, uuid, varchar, integer, decimal, timestamp, boolean, text, foreignKey, index } from 'drizzle-orm/pg-core';
 import { accounts } from './accounts';
 
 export const orders = pgTable('orders', {
@@ -22,7 +22,11 @@ export const orders = pgTable('orders', {
   cancelledAt: timestamp('cancelled_at', { withTimezone: true }),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
-});
+}, (table) => ({
+  accountIdIdx: index('orders_account_id_idx').on(table.accountId),
+  symbolIdx: index('orders_symbol_idx').on(table.symbol),
+  statusIdx: index('orders_status_idx').on(table.status),
+}));
 
 export type Order = typeof orders.$inferSelect;
 export type NewOrder = typeof orders.$inferInsert;

@@ -43,7 +43,7 @@ export class CandlesRepository {
 
     return db.query.candles.findMany({
       where: and(...conditions),
-      limit: options.limit,
+      limit: options.limit ?? undefined,
       orderBy: asc(candles.timestamp),
     });
   }
@@ -70,8 +70,8 @@ export class CandlesRepository {
           low: data.low,
           close: data.close,
           volume: data.volume,
-          tickVolume: data.tickVolume,
-          spread: data.spread,
+          tickVolume: data.tickVolume ?? null,
+          spread: data.spread ?? null,
         },
       })
       .returning();

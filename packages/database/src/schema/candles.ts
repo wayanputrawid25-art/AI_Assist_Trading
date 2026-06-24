@@ -13,13 +13,12 @@ export const candles = pgTable('candles', {
   volume: decimal('volume', { precision: 18, scale: 3 }).notNull(),
   tickVolume: integer('tick_volume'),
   spread: integer('spread'),
-}, (table) => [
-  // Indexes for efficient queries
-  uniqueIndex('candles_symbol_timeframe_timestamp_idx')
+}, (table) => ({
+  candlesSymbolTimeframeTimestampIdx: uniqueIndex('candles_symbol_timeframe_timestamp_idx')
     .on(table.symbol, table.timeframe, table.timestamp),
-  index('candles_symbol_timeframe_idx')
+  candlesSymbolTimeframeIdx: index('candles_symbol_timeframe_idx')
     .on(table.symbol, table.timeframe),
-]);
+}));
 
 export type Candle = typeof candles.$inferSelect;
 export type NewCandle = typeof candles.$inferInsert;

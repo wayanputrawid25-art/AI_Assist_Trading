@@ -1,7 +1,9 @@
 // Symbols Repository - Trading symbols/currencies
-import { eq, and, like, sql } from 'drizzle-orm';
+import { eq, and, like, sql, inArray } from 'drizzle-orm';
 import { db } from '../index';
 import { symbols, type Symbol, type NewSymbol } from '../schema/symbols';
+
+type SymbolCategory = 'forex' | 'crypto' | 'commodity' | 'index' | 'stock';
 
 export class SymbolsRepository {
   async findById(id: string): Promise<Symbol | undefined> {
@@ -17,7 +19,7 @@ export class SymbolsRepository {
   }
 
   async findAll(options: {
-    category?: string;
+    category?: SymbolCategory;
     isActive?: boolean;
     search?: string;
     limit?: number;
@@ -39,13 +41,13 @@ export class SymbolsRepository {
 
     return db.query.symbols.findMany({
       where: conditions.length > 0 ? and(...conditions) : undefined,
-      limit: options.limit,
-      offset: options.offset,
+      limit: options.limit ?? undefined,
+      offset: options.offset ?? undefined,
       orderBy: (symbols, { asc }) => [asc(symbols.name)],
     });
   }
 
-  async findByCategory(category: string): Promise<Symbol[]> {
+  async findByCategory(category: SymbolCategory): Promise<Symbol[]> {
     return db.query.symbols.findMany({
       where: eq(symbols.category, category),
       orderBy: (symbols, { asc }) => [asc(symbols.name)],
@@ -83,7 +85,7 @@ export class SymbolsRepository {
     return (result.rowCount ?? 0) > 0;
   }
 
-  async getCategories(): Promise<string[]> {
+  async getCategories(): Promise<(SymbolCategory | null)[]> {
     const result = await db
       .select({ category: symbols.category })
       .from(symbols)
@@ -91,7 +93,7 @@ export class SymbolsRepository {
     return result.map(r => r.category);
   }
 
-  async count(options: { category?: string; isActive?: boolean } = {}): Promise<number> {
+  async count(options: { category?: SymbolCategory; isActive?: boolean } = {}): Promise<number> {
     const conditions = [];
     if (options.category) {
       conditions.push(eq(symbols.category, options.category));

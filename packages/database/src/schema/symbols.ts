@@ -1,5 +1,5 @@
 // Trading Symbols table
-import { pgTable, uuid, varchar, decimal, boolean, timestamp, integer } from 'drizzle-orm/pg-core';
+import { pgTable, uuid, varchar, decimal, boolean, timestamp, integer, index } from 'drizzle-orm/pg-core';
 
 export const symbols = pgTable('symbols', {
   id: uuid('id').primaryKey().defaultRandom(),
@@ -16,9 +16,13 @@ export const symbols = pgTable('symbols', {
   swapShort: decimal('swap_short', { precision: 10, scale: 2 }),
   marginHedge: decimal('margin_hedge', { precision: 5, scale: 2 }).default('0.5'),
   isEnabled: boolean('is_enabled').default(true),
+  isActive: boolean('is_active').default(true),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
-});
+}, (table) => ({
+  categoryIdx: index('symbols_category_idx').on(table.category),
+  isActiveIdx: index('symbols_is_active_idx').on(table.isActive),
+}));
 
 export type Symbol = typeof symbols.$inferSelect;
 export type NewSymbol = typeof symbols.$inferInsert;

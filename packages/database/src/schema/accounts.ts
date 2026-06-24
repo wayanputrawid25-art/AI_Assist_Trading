@@ -1,5 +1,5 @@
 // MT5 Trading Accounts table
-import { pgTable, uuid, varchar, integer, decimal, timestamp, boolean, foreignKey } from 'drizzle-orm/pg-core';
+import { pgTable, uuid, varchar, integer, decimal, timestamp, boolean, index } from 'drizzle-orm/pg-core';
 import { users } from './users';
 
 export const accounts = pgTable('accounts', {
@@ -18,7 +18,11 @@ export const accounts = pgTable('accounts', {
   lastSyncAt: timestamp('last_sync_at', { withTimezone: true }),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
-});
+  deletedAt: timestamp('deleted_at', { withTimezone: true }),
+}, (table) => ({
+  userIdIdx: index('accounts_user_id_idx').on(table.userId),
+  mt5LoginIdx: index('accounts_mt5_login_idx').on(table.mt5Login),
+}));
 
 export type Account = typeof accounts.$inferSelect;
 export type NewAccount = typeof accounts.$inferInsert;

@@ -1,5 +1,7 @@
 # ForexOS Environment Configuration
 
+**Last Updated:** 2026-06-25
+
 Complete reference for environment variables across all ForexOS applications.
 
 ---
@@ -7,14 +9,15 @@ Complete reference for environment variables across all ForexOS applications.
 ## Table of Contents
 
 1. [Overview](#overview)
-2. [Variable Categories](#variable-categories)
-3. [Frontend Variables](#frontend-variables)
-4. [Backend Variables](#backend-variables)
-5. [Robot Variables](#robot-variables)
-6. [Shared Variables](#shared-variables)
-7. [Naming Conventions](#naming-conventions)
-8. [Security Guidelines](#security-guidelines)
-9. [Setup Instructions](#setup-instructions)
+2. [File Structure](#file-structure)
+3. [Variable Categories](#variable-categories)
+4. [Frontend Variables](#frontend-variables)
+5. [Backend Variables](#backend-variables)
+6. [Robot Variables](#robot-variables)
+7. [Shared Variables](#shared-variables)
+8. [Naming Conventions](#naming-conventions)
+9. [Security Guidelines](#security-guidelines)
+10. [Setup Instructions](#setup-instructions)
 
 ---
 
@@ -27,6 +30,26 @@ ForexOS uses a monorepo structure with three main applications:
 | Frontend | `apps/web` | Next.js web application |
 | Backend | `apps/api` | Node.js REST API |
 | Robot | `robot/` | Python MT5 trading robot |
+
+---
+
+## File Structure
+
+The environment configuration is **separated by component** to avoid duplicates and ensure proper variable scoping:
+
+| File | Scope | Purpose |
+|------|-------|---------|
+| `.env` (root) | Shared | Variables used by multiple components |
+| `apps/web/.env.example` | Frontend | Frontend-specific public variables |
+| `apps/api/.env.example` | Backend | Backend-specific server variables |
+| `robot/.env.example` | Robot | Python trading robot variables |
+
+### Why Separate Files?
+
+1. **Security**: Secrets are isolated to the components that need them
+2. **Clarity**: Developers know exactly which variables each component uses
+3. **Maintenance**: Easier to manage and update variables per component
+4. **No Duplicates**: Each variable exists in exactly one location
 
 ---
 
@@ -44,17 +67,23 @@ ForexOS uses a monorepo structure with three main applications:
 
 | Prefix | Scope | Description |
 |--------|-------|-------------|
-| `NEXT_PUBLIC_` | Browser + Server | Public variables |
-| (none) | Server-side only | Backend secrets |
-| `MT5_` | Robot | MT5 trading |
-| `API_` | Robot | API connection |
-| `ROBOT_` | Backend | Robot configuration |
+| `NEXT_PUBLIC_` | Browser + Server | Public variables (browser-exposed) |
+| (none) | Server-side only | Backend/Component secrets |
+| `MT5_` | Robot | MT5 trading configuration |
+| `API_` | Robot | API connection settings |
+| `ROBOT_` | Backend | Robot API configuration |
 
 ---
 
 ## Frontend Variables
 
 **Location:** `apps/web/.env.example`
+
+### Setup
+
+```bash
+cp apps/web/.env.example apps/web/.env.local
+```
 
 ### ✅ Public Variables (Safe to Expose)
 
@@ -257,15 +286,31 @@ LOG_LEVEL=INFO
 
 ---
 
-## Shared Variables
+## Shared Variables (Root)
 
-Variables used across multiple applications:
+**Location:** `.env` (root)
 
-| Variable | Frontend | Backend | Robot | Description |
-|----------|---------|---------|-------|-------------|
-| `NODE_ENV` | ✅ | ✅ | ❌ | Environment mode |
-| `DATABASE_URL` | ❌ | ✅ | ✅ | Database connection |
-| `REDIS_URL` | ❌ | ✅ | ✅ | Redis connection |
+Variables used by multiple components are defined in the root `.env`:
+
+```bash
+# =============================================================================
+# ForexOS - Root Environment Variables
+# =============================================================================
+# This file contains SHARED variables used by multiple components.
+
+# NODE Environment
+NODE_ENV=development
+
+# Database (Neon PostgreSQL) - Used by API and Robot
+DATABASE_URL=postgresql://user:password@host.neon.tech/dbname?sslmode=require
+```
+
+### Root Shared Variables
+
+| Variable | Used By | Description |
+|----------|---------|-------------|
+| `NODE_ENV` | All | Environment mode (`development`, `staging`, `production`) |
+| `DATABASE_URL` | API, Robot | PostgreSQL connection string |
 
 ---
 
@@ -334,11 +379,11 @@ if (!process.env.DATABASE_URL) {
 ### 1. Copy Environment Files
 
 ```bash
-# Root environment
+# Root environment (shared variables)
 cp .env.example .env
 
 # Frontend environment
-cp apps/web/.env.example apps/web/.env
+cp apps/web/.env.example apps/web/.env.local
 
 # Backend environment
 cp apps/api/.env.example apps/api/.env
@@ -346,6 +391,8 @@ cp apps/api/.env.example apps/api/.env
 # Robot environment
 cp robot/.env.example robot/.env
 ```
+
+**Note:** Frontend uses `.env.local` to prevent committed secrets. Backend and Robot use `.env` as they are not deployed as frontend assets.
 
 ### 2. Fill in Secrets
 
@@ -444,4 +491,4 @@ Add each variable with appropriate environment scope:
 
 ---
 
-*Last updated: 2026-06-24*
+*Last updated: 2026-06-25*

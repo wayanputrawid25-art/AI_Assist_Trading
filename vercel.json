@@ -1,6 +1,6 @@
 {
   "framework": "nextjs",
-  "buildCommand": "cd apps/web && npm install && npm run build",
+  "buildCommand": "npx turbo build --filter=//web",
   "outputDirectory": "apps/web/.next",
   "installCommand": "npm install",
   "devCommand": "cd apps/web && npm run dev",
@@ -12,9 +12,18 @@
   },
   "projectSettings": {
     "frameworkPreset": "NEXTJS",
-    "buildCommand": "cd apps/web && npm install && npm run build",
+    "buildCommand": "npx turbo build --filter=//web",
     "outputDirectory": "apps/web/.next",
     "installCommand": "npm install",
     "devCommand": "cd apps/web && npm run dev"
-  }
+  },
+  "env": {
+    "NEXT_PUBLIC_APP_URL": "@app-url",
+    "NEXT_PUBLIC_API_URL": "@api-url",
+    "NEXT_PUBLIC_APP_ENV": "@app-env",
+    "NEXT_PUBLIC_NODE_ENV": "@node-env",
+    "NEXT_PUBLIC_ENABLE_ANALYTICS": "@enable-analytics",
+    "NEXT_PUBLIC_ENABLE_DEBUG_MODE": "@enable-debug"
+  },
+  "scope": "forexos"
 }
